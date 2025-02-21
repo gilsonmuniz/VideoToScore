@@ -74,4 +74,8 @@ while True:
     frame_count += 1
 
 process.wait()
-print("\nProcessamento concluído!")
+
+# Obtém informações do arquivo de áudio
+probe = ffmpeg.probe(AUDIO_FILE)
+music_duration = float(probe["format"]["duration"])
+print(f"\nDuração total da música: {music_duration:.2f} segundos\n")
