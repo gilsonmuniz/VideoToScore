@@ -1,25 +1,16 @@
 import numpy as np
 import aubio
-import pyaudio
-import time
+import ffmpeg
 
-# Configuracao do audio
-FORMAT = pyaudio.paFloat32
-CHANNELS = 1
+# Nome do arquivo de áudio baixado
+AUDIO_FILE = "audio.wav"
+
+# Configuração do processamento
+BUFFER_SIZE = 1024  # Tamanho do buffer do aubio
+HOP_SIZE = BUFFER_SIZE  # Salto entre as janelas
 RATE = 44100  # Taxa de amostragem
-BUFFER_SIZE = 1024  # Tamanho do buffer
 
-# Inicializa PyAudio
-p = pyaudio.PyAudio()
-stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                input=True, frames_per_buffer=BUFFER_SIZE)
-
-# Inicializa Aubio para deteccao de pitch
-pitch_o = aubio.pitch("default", BUFFER_SIZE, BUFFER_SIZE // 2, RATE)
-pitch_o.set_unit("Hz")
-pitch_o.set_silence(-40)  # Define o limite de silencio
-
-# Funcao para converter frequencia em nota musical
+# Função para converter frequência em nota musical
 def freq_to_note(freq):
     if freq > 0:
         note_number = 12 * np.log2(freq / 440.0) + 49
@@ -28,30 +19,59 @@ def freq_to_note(freq):
         octave = (note_number // 12) - 1
         note = notes[note_number % 12]
         return f"{note}{octave}"
-    return "Silencio"
+    return "Silêncio"
 
-print("Capturando audio...")
+# Usa ffmpeg para converter áudio em fluxo de amostras
+process = (
+    ffmpeg.input(AUDIO_FILE)
+    .output("pipe:", format="f32le", acodec="pcm_f32le", ac=1, ar=RATE)
+    .run_async(pipe_stdout=True, pipe_stderr=True)
+)
 
-# Variaveis para calcular a duracao da nota
+# Inicializa Aubio para detecção de pitch
+pitch_o = aubio.pitch("default", BUFFER_SIZE, HOP_SIZE, RATE)
+pitch_o.set_unit("Hz")
+pitch_o.set_silence(-40)  # Define limite de silêncio
+
+print("\nProcessando áudio...\n")
+
+# Variáveis para calcular a duração da nota
 current_note = None
-start_time = None
+start_time = 0
+frame_count = 0
 
-# Loop de deteccao em tempo real
+# Lê e processa o áudio
 while True:
-    audio_data = stream.read(BUFFER_SIZE, exception_on_overflow=False)
-    samples = np.frombuffer(audio_data, dtype=np.float32)
+    raw_audio = process.stdout.read(HOP_SIZE * 4)  # 4 bytes por amostra (float32)
+    if not raw_audio:
+        break  # Fim do áudio
+
+    samples = np.frombuffer(raw_audio, dtype=np.float32)
+
+    # Garante que o tamanho da amostra seja 1024 antes de passar para o aubio
+    if len(samples) < BUFFER_SIZE:
+        samples = np.pad(samples, (0, BUFFER_SIZE - len(samples)))  # Preenche com zeros
+
     freq = pitch_o(samples)[0]
-    
+
+    # Filtro de ruído - Remove frequências irrelevantes
+    if freq < 50 or freq > 4000:
+        continue
+
     note = freq_to_note(freq)
+    time_seconds = frame_count * (HOP_SIZE / RATE)
 
     # Se a nota mudou ou foi interrompida
     if note != current_note:
-        if current_note is not None and current_note != "Silencio":
-            duration = time.time() - start_time
-            print(f"Nota: {current_note} | Duracao: {duration:.2f} s")
-        
+        if current_note is not None and current_note != "Silêncio":
+            duration = time_seconds - start_time
+            print(f"Nota: {current_note} | Duração: {duration:.2f} s")
+
         # Atualiza para a nova nota
         current_note = note
-        start_time = time.time()
+        start_time = time_seconds
 
-    time.sleep(0.05)  # Pequeno delay para nao sobrecarregar o processamento
+    frame_count += 1
+
+process.wait()
+print("\nProcessamento concluído!")
