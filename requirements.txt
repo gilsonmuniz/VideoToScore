@@ -19,6 +19,7 @@ lazy-loader==0.4
 librosa==0.10.2.post1
 llvmlite==0.41.1
 matplotlib==3.7.5
+MIDIUtil==1.2.1
 msgpack==1.1.0
 mutagen==1.47.0
 numba==0.58.1

@@ -1,65 +1,49 @@
-import librosa
-import librosa.display
+import aubio
 import numpy as np
+from midiutil import MIDIFile
 
-def detectar_notas(y, sr):
-    # Detectar as frequências das notas (pode detectar múltiplas notas)
-    pitches, magnitudes = librosa.core.piptrack(y=y, sr=sr)
+# Função para converter áudio para notas
+def audio_to_midi(audio_file, output_file):
+    # Configuração
+    samplerate = 44100
+    win_s = 1024
+    hop_s = win_s // 2
 
-    notas_detectadas = []
+    # Criação de objetos
+    source = aubio.source(audio_file, samplerate, hop_s)
+    pitch_detector = aubio.pitch("yin", win_s)
+    pitch_detector.set_unit("Hz")
+    pitch_detector.set_tolerance(0.8)
 
-    # Loop para cada quadro e detectar notas
-    for t in range(magnitudes.shape[1]):
-        # Pega as magnitudes das frequências para o quadro t
-        pitch_values = pitches[:, t]
-        magnitude_values = magnitudes[:, t]
+    # Inicialização do arquivo MIDI
+    midi = MIDIFile(1)
+    midi.addTempo(0, 0, 120)  # Canal 0, tempo 120 BPM
+    track = 0
+    channel = 0
+    time = 0  # tempo inicial no arquivo MIDI
+    midi.addTrackName(track, time, "Track 1")
 
-        # Filtrar frequências significativas (com magnitude maior que um threshold)
-        significant_pitches = pitch_values[magnitude_values > np.median(magnitude_values)]
+    # Processar o áudio para detecção de notas
+    while True:
+        samples, read = source()
+        pitch = pitch_detector(samples)[0]
 
-        # Verifique as frequências detectadas
-        print(f"Frame {t}: Frequências detectadas: {significant_pitches}")
+        if pitch != 0:  # Se uma nota for detectada
+            # Convertendo o valor de pitch para um valor de nota MIDI inteiro
+            pitch_int = int(round(pitch))  # Arredonda para o inteiro mais próximo
+            if 0 <= pitch_int < 128:  # Verifica se a nota está no intervalo MIDI
+                midi.addNote(track, channel, pitch_int, time, 1, 100)  # Nota: pitch, tempo, duração, volume
 
-        # Para cada pitch significativo, converter para nota
-        for pitch in significant_pitches:
-            if pitch > 0:
-                nota = librosa.hz_to_note(pitch)
-                notas_detectadas.append((nota, t))
-    
-    return notas_detectadas
+        time += 1
+        if read < hop_s:
+            break
 
-def calcular_duracao(notas_detectadas):
-    duracoes = []
-    for i in range(len(notas_detectadas)):
-        if i + 1 < len(notas_detectadas):
-            # Se for a mesma nota e dentro de um pequeno intervalo de tempo, é a mesma nota
-            if notas_detectadas[i][0] == notas_detectadas[i + 1][0]:
-                duracoes.append((notas_detectadas[i + 1][1] - notas_detectadas[i][1]) / 50.0)  # A duração estimada em segundos
-    return duracoes
+    # Salvar o arquivo MIDI
+    with open(output_file, "wb") as f:
+        midi.writeFile(f)
 
+# Exemplo de uso
 music_name = input("Insira o nome da música: ")
-
-# Carregar o áudio
-y, sr = librosa.load("audios/{}.wav".format(music_name))
-
-# Detectar as notas tocadas simultaneamente
-notas_detectadas = detectar_notas(y, sr)
-
-# Agrupar as notas simultâneas por tempo
-notas_simultaneas = []
-tempo_maximo = 20  # Tolerância de tempo para considerar as notas simultâneas
-
-for t in range(0, len(notas_detectadas), tempo_maximo):
-    notas_simultaneas.append(notas_detectadas[t:t + tempo_maximo])
-
-# Abrir o arquivo para escrita
-with open("texts/{}.txt".format(music_name), 'w') as file:
-    # Escrever notas simultâneas e suas durações
-    for notas in notas_simultaneas:
-        notas_unicas = list(set([nota[0] for nota in notas]))
-        duracoes = calcular_duracao(notas)
-
-        # Escrever as notas e durações na mesma linha
-        file.write("Notas: ")
-        file.write(", ".join([f"Nota: {nota} | Duração: {duracao:.2f} s" for nota, duracao in zip(notas_unicas, duracoes)]))
-        file.write("\n")
+audio_file = "audios/{}.wav".format(music_name)  # Substitua com o seu arquivo de áudio
+output_file = "midis/{}.mid".format(music_name)  # Nome do arquivo MIDI de saída
+audio_to_midi(audio_file, output_file)
