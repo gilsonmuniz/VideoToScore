@@ -9,8 +9,10 @@ notas_ordenadas = [
     for nota in ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
 ]
 
+music_name = input("Insira o nome da música: ")
+
 # Lendo o arquivo de entrada
-with open("wicked_game.txt", "r", encoding="utf-8") as file:
+with open("texts/{}.txt".format(music_name), "r", encoding="utf-8") as file:
     linhas = file.readlines()
 
 # Processamento das notas
@@ -24,4 +26,4 @@ for linha in linhas:
 
 # Criando DataFrame e exportando para Excel
 df = pd.DataFrame(dados, columns=notas_ordenadas)
-df.to_excel("wicked_game.xlsx", index=False)
+df.to_excel("excels/{}.xlsx".format(music_name), index=False)

@@ -17,6 +17,9 @@ def detectar_notas(y, sr):
         # Filtrar frequências significativas (com magnitude maior que um threshold)
         significant_pitches = pitch_values[magnitude_values > np.median(magnitude_values)]
 
+        # Verifique as frequências detectadas
+        print(f"Frame {t}: Frequências detectadas: {significant_pitches}")
+
         # Para cada pitch significativo, converter para nota
         for pitch in significant_pitches:
             if pitch > 0:
@@ -34,8 +37,10 @@ def calcular_duracao(notas_detectadas):
                 duracoes.append((notas_detectadas[i + 1][1] - notas_detectadas[i][1]) / 50.0)  # A duração estimada em segundos
     return duracoes
 
+music_name = input("Insira o nome da música: ")
+
 # Carregar o áudio
-y, sr = librosa.load('wicked_game.wav')
+y, sr = librosa.load("audios/{}.wav".format(music_name))
 
 # Detectar as notas tocadas simultaneamente
 notas_detectadas = detectar_notas(y, sr)
@@ -48,7 +53,7 @@ for t in range(0, len(notas_detectadas), tempo_maximo):
     notas_simultaneas.append(notas_detectadas[t:t + tempo_maximo])
 
 # Abrir o arquivo para escrita
-with open('notas_detectadas.txt', 'w') as file:
+with open("texts/{}.txt".format(music_name), 'w') as file:
     # Escrever notas simultâneas e suas durações
     for notas in notas_simultaneas:
         notas_unicas = list(set([nota[0] for nota in notas]))
