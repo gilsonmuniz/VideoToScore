@@ -2,15 +2,8 @@ import cv2
 import os
 import numpy as np
 
-def detect_notes(video_path):
-    if not os.path.exists(video_path):
-        print(f"Erro: Arquivo {video_path} não encontrado.")
-        return []
-    
+def detect_notes(video_path):    
     cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print("Erro ao abrir o vídeo.")
-        return []
     
     print(f"Processando vídeo: {video_path}")
     

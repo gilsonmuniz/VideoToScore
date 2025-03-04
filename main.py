@@ -16,6 +16,7 @@ if __name__ == "__main__":
 
     # Etapa 2: Processar o vídeo para detectar notas
     detected_notes = detect_notes(video_path)  # Agora retorna as notas detectadas
+    print(detected_notes)
 
     # Etapa 3: Gerar a partitura com as notas extraídas
     generate_music_xml(music_name, detected_notes)
