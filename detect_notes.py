@@ -18,8 +18,8 @@ def detectar_mudancas(video_path, start_time=30, end_time=40):
 
     cv2.namedWindow("Detecção", cv2.WINDOW_NORMAL)
 
-    num_bolinhas = 10 # Alterar no futuro p/ identificar o número de teclas que está sendo exibido
-    altura_bolinhas = prev_frame.shape[0] // 2  # Metade da altura do vídeo
+    num_bolinhas = 10
+    altura_bolinhas = prev_frame.shape[0] - 10  # 10 pixels acima da parte inferior do vídeo
     espacamento = prev_frame.shape[1] // (num_bolinhas + 1)  # Espaço entre bolinhas
 
     for frame_idx in range(start_frame, end_frame):
@@ -34,10 +34,18 @@ def detectar_mudancas(video_path, start_time=30, end_time=40):
         # Converter para BGR para desenhar as bolinhas vermelhas
         thresh_bgr = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
         
-        # Desenhar bolinhas vermelhas
+        # Verificar mudanças nas posições das bolinhas
+        mudancas = {}
         for i in range(1, num_bolinhas + 1):
             x = i * espacamento
             cv2.circle(thresh_bgr, (x, altura_bolinhas), 10, (0, 0, 255), -1)
+            
+            # Verificar se a posição da bolinha tem pixels brancos
+            if thresh[altura_bolinhas, x] == 255:
+                mudancas[f"bolinha {i}"] = True
+        
+        if mudancas:
+            print(mudancas)
         
         cv2.imshow("Detecção", thresh_bgr)
         
