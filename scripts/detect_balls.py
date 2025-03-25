@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
 
-def identificar_bolas(imagem_com_bolas, imagem_original, output_path):
+def identify_balls(balls_image_path, original_image_path, output_path):
     # Carregar as imagens
-    img_bolas = cv2.imread(imagem_com_bolas)
-    img_original = cv2.imread(imagem_original)
+    balls_image = cv2.imread(balls_image_path)
+    original_image = cv2.imread(original_image_path)
 
     # Converter para o espaço de cor HSV (melhor para detectar cores)
-    hsv_img = cv2.cvtColor(img_bolas, cv2.COLOR_BGR2HSV)
+    hsv_img = cv2.cvtColor(balls_image, cv2.COLOR_BGR2HSV)
 
     # Definir os limites para a cor vermelha #FF0000 em HSV
     # #FF0000 é equivalente a (0, 255, 255) em HSV (vermelho puro)
@@ -20,7 +20,7 @@ def identificar_bolas(imagem_com_bolas, imagem_original, output_path):
     # Encontrar os contornos das bolas vermelhas detectadas
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    bola_count = 1
+    balls_count = 1
     for contour in contours:
         # Se o contorno for grande o suficiente para ser uma bola
         if cv2.contourArea(contour) > 100:  # Ajuste este valor se necessário
@@ -31,27 +31,27 @@ def identificar_bolas(imagem_com_bolas, imagem_original, output_path):
             x, y = int(x), int(y)
 
             # Obter a cor da imagem original nesse ponto
-            cor_original = img_original[y, x]
-            cor_hex = '#{:02x}{:02x}{:02x}'.format(cor_original[2], cor_original[1], cor_original[0])
+            original_color = original_image[y, x]
+            cor_hex = '#{:02x}{:02x}{:02x}'.format(original_color[2], original_color[1], original_color[0])
 
             # Imprimir as informações
-            print(f'Bola {bola_count}:')
-            print(f'    Posição: x={x}, y={y}')
-            print(f'    Cor da imagem original nesse ponto: {cor_hex}')
-            print()
+            # print(f'Bola {balls_count}:')
+            # print(f'    Posição: x={x}, y={y}')
+            # print(f'    Cor da imagem original nesse ponto: {cor_hex}')
+            # print()
 
             # Desenhar um "X" azul na imagem original
-            cv2.line(img_original, (x - 10, y - 10), (x + 10, y + 10), (255, 0, 0), 2)  # Linha diagonal 1
-            cv2.line(img_original, (x - 10, y + 10), (x + 10, y - 10), (255, 0, 0), 2)  # Linha diagonal 2
+            cv2.line(original_image, (x - 10, y - 10), (x + 10, y + 10), (255, 0, 0), 2)  # Linha diagonal 1
+            cv2.line(original_image, (x - 10, y + 10), (x + 10, y - 10), (255, 0, 0), 2)  # Linha diagonal 2
 
-            bola_count += 1
+            balls_count += 1
 
     # Salvar a imagem com os "X"s azuis
-    cv2.imwrite(output_path, img_original)
+    cv2.imwrite(output_path, original_image)
     print(f'Imagem salva como: {output_path}')
 
 # Exemplo de uso
-imagem_com_bolas = '../images/heart_and_soul_frame_keys_cordinates.png'
-imagem_original = '../images/heart_and_soul_frame.png'
-output_path = '../images/imagem_com_Xs_azuis.png'
-identificar_bolas(imagem_com_bolas, imagem_original, output_path)
+balls_image = '../images/heart_and_soul_frame_keys_cordinates.png'
+original_image = '../images/heart_and_soul_frame.png'
+output = '../images/heart_and_soul_keys_identified.png'
+identify_balls(balls_image, original_image, output)
