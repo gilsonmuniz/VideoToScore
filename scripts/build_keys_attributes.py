@@ -26,17 +26,3 @@ def process_video_and_identify_balls(video_path, balls_image_path, original_imag
 
     # 5. Retornar o dicionário atualizado com as cores
     return balls_coordinates
-
-# Exemplo de uso:
-video_path = '../videos/heart_and_soul_cutted.webm'
-balls_image_path = '../images/heart_and_soul_frame_keys_cordinates.png'
-original_image_path = '../images/heart_and_soul_frame.png'
-output_path = '../images/heart_and_soul_keys_identified.png'
-frame_path = '../images/test.png'
-
-balls_info = process_video_and_identify_balls(video_path, balls_image_path, original_image_path, output_path, frame_path)
-
-# Exibir os resultados no terminal
-for ball_number, info in balls_info.items():
-    print(f'Bola {ball_number}:')
-    print(f'    x={info["x"]}, y={info["y"]}, color={info["color"]}')

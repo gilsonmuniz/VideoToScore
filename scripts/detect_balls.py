@@ -39,9 +39,9 @@ def identify_balls(balls_image_path, original_image_path, output_path):
             # Armazenar as coordenadas no dicionário
             balls_coordinates[balls_count] = (x, y)
 
-            # Desenhar um "X" azul na imagem original
-            cv2.line(original_image, (x - 10, y - 10), (x + 10, y + 10), (255, 0, 0), 2)  # Linha diagonal 1
-            cv2.line(original_image, (x - 10, y + 10), (x + 10, y - 10), (255, 0, 0), 2)  # Linha diagonal 2
+            cv2.putText(original_image, str(balls_count), (x - 15, y - 15), 
+            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
+
 
             balls_count += 1
 
@@ -51,14 +51,3 @@ def identify_balls(balls_image_path, original_image_path, output_path):
 
     # Retornar o dicionário com as coordenadas das bolas
     return balls_coordinates
-
-# Exemplo de uso
-balls_image = '../images/heart_and_soul_frame_keys_cordinates.png'
-original_image = '../images/heart_and_soul_frame.png'
-output = '../images/heart_and_soul_keys_identified.png'
-coordinates = identify_balls(balls_image, original_image, output)
-
-# Exemplo de como usar o dicionário retornado
-print("Coordenadas das bolas detectadas:")
-for ball_number, coords in coordinates.items():
-    print(f'Bola {ball_number}: x={coords[0]}, y={coords[1]}')
