@@ -10,7 +10,6 @@ def identify_balls(balls_image_path, original_image_path, output_path):
     hsv_img = cv2.cvtColor(balls_image, cv2.COLOR_BGR2HSV)
 
     # Definir os limites para a cor vermelha #FF0000 em HSV
-    # #FF0000 é equivalente a (0, 255, 255) em HSV (vermelho puro)
     lower_red = np.array([0, 255, 255])  # Valor mínimo para o vermelho puro
     upper_red = np.array([10, 255, 255])  # Limite superior para o vermelho puro (ajustado para tolerância mínima)
 
@@ -20,9 +19,9 @@ def identify_balls(balls_image_path, original_image_path, output_path):
     # Encontrar os contornos das bolas vermelhas detectadas
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    balls_count = 1
-    balls_coordinates = {}  # Dicionário para armazenar as coordenadas das bolas
+    balls_coordinates = []  # Lista para armazenar as coordenadas das bolas (como tupla de (x, y))
 
+    # Detectar as bolas e armazenar suas coordenadas
     for contour in contours:
         # Se o contorno for grande o suficiente para ser uma bola
         if cv2.contourArea(contour) > 100:  # Ajuste este valor se necessário
@@ -32,22 +31,21 @@ def identify_balls(balls_image_path, original_image_path, output_path):
             # Coordenadas do centro da bola
             x, y = int(x), int(y)
 
-            # Obter a cor da imagem original nesse ponto
-            original_color = original_image[y, x]
-            cor_hex = '#{:02x}{:02x}{:02x}'.format(original_color[2], original_color[1], original_color[0])
+            # Armazenar as coordenadas da bola (não numeradas ainda)
+            balls_coordinates.append((x, y))
 
-            # Armazenar as coordenadas no dicionário
-            balls_coordinates[balls_count] = (x, y)
+    # Ordenar as coordenadas das bolas pela posição horizontal (x)
+    balls_coordinates.sort(key=lambda coord: coord[0])
 
-            cv2.putText(original_image, str(balls_count), (x - 15, y - 15), 
-            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
+    # Numerar as bolas da esquerda para a direita
+    for balls_count, (x, y) in enumerate(balls_coordinates, start=1):
+        # Desenhar o número da bola na imagem original
+        cv2.putText(original_image, str(balls_count), (x - 15, y - 15), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
 
-
-            balls_count += 1
-
-    # Salvar a imagem com os "X"s azuis
+    # Salvar a imagem com os números das bolas
     cv2.imwrite(output_path, original_image)
     print(f'Imagem salva como: {output_path}')
 
-    # Retornar o dicionário com as coordenadas das bolas
-    return balls_coordinates
+    # Retornar um dicionário com as coordenadas das bolas
+    return {i + 1: coord for i, coord in enumerate(balls_coordinates)}
