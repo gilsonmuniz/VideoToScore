@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from build_keys_attributes import process_video_and_identify_balls
 
+COLOR_THRESHOLD = 200
+
 def watch_video_and_detect_color_changes(video_path, balls_info):
     """
     Assista ao vídeo e detecta quando a cor de uma bola muda.
@@ -32,19 +34,33 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
         # Para cada bola, verificar se a cor mudou
         for ball_number, info in balls_info.items():
             x, y = info['x'], info['y']
-            original_color = info['color']
-            
+            original_color_hex = info['color']
+
             # Obter a cor atual da bola no frame (em formato BGR)
             color_bgr = frame[y, x]
-            color_hex = '#{:02x}{:02x}{:02x}'.format(color_bgr[2], color_bgr[1], color_bgr[0])
+            color_rgb = np.array([color_bgr[2], color_bgr[1], color_bgr[0]])  # Converter para RGB
 
-            # Verificar se a cor mudou
-            if color_hex != previous_colors[ball_number]:
-                if color_hex == original_color:
-                    print(f'Bola {ball_number} voltou à cor original ({original_color}) no tempo {current_time:.2f}s.')
+            # Obter a cor anterior no formato RGB
+            previous_color_hex = previous_colors[ball_number]
+            previous_color_rgb = np.array([
+                int(previous_color_hex[1:3], 16),
+                int(previous_color_hex[3:5], 16),
+                int(previous_color_hex[5:7], 16)
+            ])
+
+            # Calcular a distância euclidiana entre as cores
+            color_distance = np.linalg.norm(color_rgb - previous_color_rgb)
+
+            # Se a mudança for maior que o limiar, considerar uma alteração significativa
+            if color_distance > COLOR_THRESHOLD:
+                # Converter a cor atual para hexadecimal
+                color_hex = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
+
+                if color_hex == original_color_hex:
+                    print(f'Bola {ball_number} voltou à cor original ({original_color_hex}) no tempo {current_time:.2f}s.')
                 else:
                     print(f'Bola {ball_number} mudou de cor para {color_hex} no tempo {current_time:.2f}s.')
-                
+
                 # Atualizar a cor no dicionário de estados anteriores
                 previous_colors[ball_number] = color_hex
 
