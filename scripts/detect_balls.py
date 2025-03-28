@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from name_keys import name_keys
 
 def identify_balls(balls_image_path, original_image_path, output_path):
     # Carregar as imagens
@@ -40,7 +41,8 @@ def identify_balls(balls_image_path, original_image_path, output_path):
     # Numerar as bolas da esquerda para a direita
     for balls_count, (x, y) in enumerate(balls_coordinates, start=1):
         # Desenhar o número da bola na imagem original
-        cv2.putText(original_image, str(balls_count), (x - 15, y - 15), 
+        key_name = name_keys(11, 36)[balls_count]
+        cv2.putText(original_image, key_name, (x - 15, y - 15), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
 
     # Salvar a imagem com os números das bolas
