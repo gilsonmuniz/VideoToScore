@@ -46,12 +46,10 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
             if color_distance > COLOR_THRESHOLD:
                 key_name = keys_names[ball_number]
                 music[key_name].append(current_time)
-                if key_name == 'C3':
-                    current_color_hex = '#{:02x}{:02x}{:02x}'.format(current_color_rgb[0], current_color_rgb[1], current_color_rgb[2])
-                    print('current_color_hex:', current_color_hex)
+                current_color_hex = '#{:02x}{:02x}{:02x}'.format(current_color_rgb[0], current_color_rgb[1], current_color_rgb[2])
+                previous_colors[ball_number] = current_color_hex
 
     cap.release()
-    # print(music['C3'])
 
 video_path = '../videos/heart_and_soul_cutted.webm'
 balls_image_path = '../images/heart_and_soul_frame_keys_cordinates.png'
