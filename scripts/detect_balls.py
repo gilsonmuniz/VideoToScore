@@ -47,7 +47,7 @@ def identify_balls(balls_image_path, original_image_path, output_path):
 
     # Salvar a imagem com os números das bolas
     cv2.imwrite(output_path, original_image)
-    print(f'Imagem salva como: {output_path}')
+    # print(f'Imagem salva como: {output_path}')
 
     # Retornar um dicionário com as coordenadas das bolas
     return {i + 1: coord for i, coord in enumerate(balls_coordinates)}

@@ -16,7 +16,7 @@ def get_frame_at_second_0(video_path, output_image_path):
     if ret:
         # Salvar a imagem do primeiro frame
         cv2.imwrite(output_image_path, frame)
-        print(f"Imagem salva em: {output_image_path}")
+        # print(f"Imagem salva em: {output_image_path}")
 
         # Retornar o frame
         return frame

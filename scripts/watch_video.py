@@ -2,8 +2,10 @@ import cv2
 import numpy as np
 from build_keys_attributes import process_video_and_identify_balls
 from name_keys import name_keys
+from datetime import datetime
+import os
 
-COLOR_THRESHOLD = 150
+COLOR_THRESHOLD = 170
 
 def watch_video_and_detect_color_changes(video_path, balls_info):
     """
@@ -49,7 +51,23 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
                 current_color_hex = '#{:02x}{:02x}{:02x}'.format(current_color_rgb[0], current_color_rgb[1], current_color_rgb[2])
                 previous_colors[ball_number] = current_color_hex
 
+                if key_name == 'C3':
+                    ret, frame = cap.read()
+                    if ret:
+                        # Obter o instante atual do vídeo (tempo atual do vídeo em segundos)
+                        current_video_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000  # Convertendo para segundos
+
+                        # Gerar o nome do arquivo com timestamp do vídeo e o código hexadecimal da cor
+                        filename = os.path.join(
+                            '../frames', 
+                            f"frame_{current_video_time:.2f}s_{current_color_hex[1:]}.png"
+                        )
+
+                        cv2.imwrite(filename, frame)
+
     cap.release()
+
+    return music
 
 video_path = '../videos/heart_and_soul_cutted.webm'
 balls_image_path = '../images/heart_and_soul_frame_keys_cordinates.png'
@@ -58,4 +76,4 @@ output_path = '../images/heart_and_soul_keys_identified.png'
 frame_path = '../images/heart_and_soul_frame.png'
 
 balls_info = process_video_and_identify_balls(video_path, balls_image_path, original_image_path, output_path, frame_path)
-watch_video_and_detect_color_changes(video_path, balls_info)
+music = watch_video_and_detect_color_changes(video_path, balls_info)
