@@ -24,11 +24,9 @@ def get_press_and_release_keys_instants(video_path, keys_attributes):
 
         current_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000 # to seconds
 
-        # Para cada bola, verificar se a cor mudou
+        # for each ball, check if color has changed
         for ball_number, info in keys_attributes.items():
             x, y = info['x'], info['y']
-            original_color_hex = info['color']
-
             current_color_bgr = frame[y, x]
             current_color_rgb = np.array([current_color_bgr[2], current_color_bgr[1], current_color_bgr[0]])
             previous_color_hex = previous_colors[ball_number]
@@ -42,20 +40,6 @@ def get_press_and_release_keys_instants(video_path, keys_attributes):
                 press_and_release_keys_instants[key_name].append(current_time)
                 current_color_hex = '#{:02x}{:02x}{:02x}'.format(current_color_rgb[0], current_color_rgb[1], current_color_rgb[2])
                 previous_colors[ball_number] = current_color_hex
-
-                if key_name == 'C3':
-                    ret, frame = cap.read()
-                    if ret:
-                        # Obter o instante atual do vídeo (tempo atual do vídeo em segundos)
-                        current_video_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000  # Convertendo para segundos
-
-                        # Gerar o nome do arquivo com timestamp do vídeo e o código hexadecimal da cor
-                        filename = os.path.join(
-                            '../frames', 
-                            f"frame_{current_video_time:.2f}s_{current_color_hex[1:]}.png"
-                        )
-
-                        cv2.imwrite(filename, frame)
 
     cap.release()
 
