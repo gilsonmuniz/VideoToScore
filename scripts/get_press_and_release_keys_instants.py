@@ -1,29 +1,21 @@
 import cv2
 import numpy as np
-from build_keys_attributes import process_video_and_identify_balls
 from name_keys import name_keys
-from datetime import datetime
 import os
 
 COLOR_THRESHOLD = 170
 
-def watch_video_and_detect_color_changes(video_path, balls_info):
-    """
-    Assista ao vídeo e detecta quando a cor de uma bola muda.
-    - `video_path`: Caminho para o vídeo.
-    - `balls_info`: Dicionário com informações das bolas, incluindo suas cores originais.
-    """
-
+def get_press_and_release_keys_instants(video_path, keys_attributes):
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
         print("Video not found.")
         return
 
-    previous_colors = {ball_number: info['color'] for ball_number, info in balls_info.items()}
+    previous_colors = {ball_number: info['color'] for ball_number, info in keys_attributes.items()}
 
-    keys_names, music = name_keys(11, 36), {}
-    for name in keys_names.values(): music[name] = []
+    keys_names, press_and_release_keys_instants = name_keys(11, 36), {}
+    for name in keys_names.values(): press_and_release_keys_instants[name] = []
 
     while True:
         ret, frame = cap.read()
@@ -33,7 +25,7 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
         current_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000 # to seconds
 
         # Para cada bola, verificar se a cor mudou
-        for ball_number, info in balls_info.items():
+        for ball_number, info in keys_attributes.items():
             x, y = info['x'], info['y']
             original_color_hex = info['color']
 
@@ -47,7 +39,7 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
 
             if color_distance > COLOR_THRESHOLD:
                 key_name = keys_names[ball_number]
-                music[key_name].append(current_time)
+                press_and_release_keys_instants[key_name].append(current_time)
                 current_color_hex = '#{:02x}{:02x}{:02x}'.format(current_color_rgb[0], current_color_rgb[1], current_color_rgb[2])
                 previous_colors[ball_number] = current_color_hex
 
@@ -67,13 +59,4 @@ def watch_video_and_detect_color_changes(video_path, balls_info):
 
     cap.release()
 
-    return music
-
-video_path = '../videos/heart_and_soul_cutted.webm'
-balls_image_path = '../images/heart_and_soul_frame_keys_cordinates.png'
-original_image_path = '../images/heart_and_soul_frame.png'
-output_path = '../images/heart_and_soul_keys_identified.png'
-frame_path = '../images/heart_and_soul_frame.png'
-
-balls_info = process_video_and_identify_balls(video_path, balls_image_path, original_image_path, output_path, frame_path)
-music = watch_video_and_detect_color_changes(video_path, balls_info)
+    return press_and_release_keys_instants
