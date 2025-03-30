@@ -25,4 +25,4 @@ press_keys_instants = get_press_keys_instants(press_and_release_keys_instants)
 press_and_hold_keys_durations = calculate_press_and_hold_keys_durations(press_and_release_keys_instants)
 music = build_music(press_keys_instants, press_and_hold_keys_durations)
 
-print(music['C3'])
+print(music)
