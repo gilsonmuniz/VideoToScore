@@ -1,77 +1,26 @@
-# Importando bibliotecas necessárias
-import numpy as np
-import music21 as m21
+def normalize_note_value(note_duration, maximum_note_duration):
+    return (note_duration * 64 / maximum_note_duration)
 
-# Dicionário fornecido pelo usuário
+
 notes_dict = {'C3': {'instants': [1.0010000000000001, 5.005, 9.009, 12.98, 16.984, 21.021, 24.992, 29.029, 31.031000000000002, 49.049, 53.053000000000004, 57.057, 65.065], 'durations': [0.9339999999999999, 0.8010000000000002, 0.9339999999999993, 0.734, 0.7999999999999972, 0.8679999999999986, 0.9669999999999987, 0.6009999999999991, 2.1350000000000016, 0.767000000000003, 0.7669999999999959, 0.7340000000000018]}, 'B2': {'instants': [], 'durations': []}, 'A#2': {'instants': [], 'durations': []}, 'A2': {'instants': [2.0020000000000002, 6.473, 9.977, 14.014000000000001, 18.018, 26.026, 35.03500000000001, 50.050000000000004, 54.054, 58.058], 'durations': [1.001, 0.4010000000000007, 1.0009999999999994, 0.9339999999999993, 0.46699999999999875, 0.968, 0.6339999999999932, 0.6009999999999991, 0.46699999999999875, 0.9340000000000046]}, 'G#2': {'instants': [], 'durations': []}, 'G2': {'instants': [3.971, 7.9750000000000005, 12.212, 16.016000000000002, 20.02, 27.995, 52.052, 56.056000000000004], 'durations': [1.0010000000000003, 1.0339999999999998, 0.8010000000000002, 1.0009999999999977, 0.934000000000001, 0.8339999999999996, 1.0010000000000048, 0.5670000000000002]}, 'F#2': {'instants': [], 'durations': []}, 'F2': {'instants': [2.97, 7.007000000000001, 19.019000000000002, 22.990000000000002, 29.997, 51.051, 55.055, 64.06400000000001], 'durations': [0.9009999999999998, 0.8339999999999996, 0.7339999999999982, 0.7999999999999972, 0.6000000000000014, 0.7340000000000089, 0.7010000000000005, 0.9679999999999893]}, 'E2': {'instants': [], 'durations': []}, 'D#2': {'instants': [], 'durations': []}, 'D2': {'instants': [], 'durations': []}, 'C#2': {'instants': [], 'durations': []}, 'C#3': {'instants': [], 'durations': []}, 'D3': {'instants': [11.011000000000001, 14.982000000000001, 27.027, 40.04, 48.048, 59.059000000000005, 63.063], 'durations': [0.8339999999999996, 0.9339999999999993, 0.8009999999999984, 0.36699999999999733, 0.5339999999999989, 0.46699999999999875, 0.7669999999999959]}, 'D#3': {'instants': [39.039, 47.047000000000004], 'durations': [0.3999999999999986, 0.5009999999999977]}, 'E3': {'instants': [34.034, 38.005, 42.042, 46.046, 61.061], 'durations': [0.5339999999999989, 0.6000000000000014, 0.46699999999999875, 0.6340000000000003, 0.5339999999999989]}, 'F3': {'instants': [33.033, 41.041000000000004], 'durations': [0.6670000000000016, 0.3339999999999961]}, 'F#3': {'instants': [36.036, 44.044000000000004], 'durations': [0.5009999999999977, 1.0009999999999977]}, 'G3': {'instants': [37.004, 45.045, 60.06], 'durations': [0.534000000000006, 0.9679999999999964, 0.5670000000000002]}, 'G#3': {'instants': [], 'durations': []}, 'A3': {'instants': [3.837, 19.82, 39.039, 47.047000000000004, 51.885], 'durations': [0.19999999999999973, 0.1999999999999993, 0.5670000000000002, 0.9339999999999975, 0.13400000000000034]}, 'A#3': {'instants': [], 'durations': []}, 'B3': {'instants': [3.47, 3.971, 19.52, 20.02, 37.004, 40.04, 45.045, 48.048, 51.552, 52.052, 64.565], 'durations': [0.3340000000000001, 0.2999999999999998, 0.2660000000000018, 0.3000000000000007, 1.0010000000000048, 0.36699999999999733, 1.033999999999999, 1.033999999999999, 0.26599999999999824, 0.30000000000000426, 0.46699999999999875]}, 'C4': {'instants': [1.0010000000000001, 1.502, 2.0020000000000002, 3.303, 4.304, 7.808, 9.977, 12.98, 16.984, 17.484, 18.018, 19.353, 20.354, 23.857, 26.026, 29.029, 31.532, 38.005, 46.046, 49.049, 49.550000000000004, 50.050000000000004, 51.385, 52.386, 55.889, 58.058, 64.06400000000001, 65.065], 'durations': [0.23399999999999999, 0.2330000000000001, 1.0339999999999998, 0.20100000000000007, 0.23399999999999999, 0.23300000000000054, 1.0670000000000002, 0.6999999999999993, 0.3329999999999984, 0.1999999999999993, 0.934000000000001, 0.13299999999999912, 0.1670000000000016, 0.1670000000000016, 1.2680000000000007, 0.6009999999999991, 1.434000000000001, 1.033999999999999, 0.9340000000000046, 0.267000000000003, 0.13299999999999557, 0.5670000000000002, 0.20000000000000284, 0.1670000000000016, 0.1670000000000016, 1.068000000000005, 0.46699999999999875]}, 'C#4': {'instants': [], 'durations': []}, 'D4': {'instants': [4.505, 7.508, 7.9750000000000005, 12.513, 14.314, 16.016000000000002, 20.521, 23.524, 24.024, 28.529, 30.364, 34.835, 36.036, 42.876, 44.044000000000004, 52.553000000000004, 55.556000000000004, 56.056000000000004, 60.561, 63.897], 'durations': [0.23300000000000054, 0.266, 0.39999999999999947, 0.4670000000000005, 0.2010000000000005, 0.968, 0.3000000000000007, 0.26599999999999824, 0.3000000000000007, 0.5, 0.1670000000000016, 0.267000000000003, 1.0009999999999977, 0.1670000000000016, 1.0009999999999977, 0.5329999999999941, 0.232999999999997, 0.3339999999999961, 0.3329999999999984, 0.1670000000000087]}, 'D#4': {'instants': [], 'durations': []}, 'E4': {'instants': [5.005, 5.472, 5.973, 7.307, 8.308, 11.979000000000001, 14.515, 15.849, 21.021, 21.522000000000002, 21.989, 23.357, 24.324, 27.995, 30.531000000000002, 34.034, 42.042, 53.053000000000004, 53.554, 54.054, 55.389, 56.39, 60.06, 61.061, 63.564], 'durations': [0.26700000000000035, 0.23399999999999999, 1.0010000000000003, 0.16699999999999982, 0.13400000000000034, 0.5339999999999989, 0.23300000000000054, 0.13400000000000034, 0.26699999999999946, 0.16599999999999682, 0.5670000000000002, 0.1670000000000016, 0.16699999999999804, 0.5, 0.26599999999999824, 0.7340000000000018, 0.8010000000000019, 0.2669999999999959, 0.13299999999999557, 0.3999999999999986, 0.1670000000000016, 0.1670000000000016, 0.46699999999999875, 2.3689999999999998, 0.26599999999999824]}, 'F4': {'instants': [8.509, 11.845, 14.815, 15.482000000000001, 24.491, 27.861, 30.864, 33.867, 41.875, 56.557, 59.893, 63.397], 'durations': [0.16600000000000037, 0.16699999999999982, 0.1670000000000016, 0.33399999999999963, 0.4670000000000023, 0.1670000000000016, 0.2339999999999982, 0.1670000000000016, 0.13400000000000034, 0.5, 0.13400000000000034, 0.20000000000000284]}, 'F#4': {'instants': [], 'durations': []}, 'G4': {'instants': [9.009, 11.512, 14.982000000000001, 24.992, 27.494, 31.031000000000002, 33.534, 41.542, 57.057, 59.56], 'durations': [0.968, 0.3330000000000002, 0.5339999999999989, 1.0010000000000012, 0.33399999999999963, 0.46699999999999875, 0.30000000000000426, 0.26599999999999824, 1.0009999999999977, 0.29999999999999716]}, 'G#4': {'instants': [], 'durations': []}, 'A4': {'instants': [11.345, 27.361, 33.367, 41.375, 59.393], 'durations': [0.13299999999999912, 0.1670000000000016, 0.20000000000000284, 0.1670000000000016, 0.1670000000000016]}, 'A#4': {'instants': [], 'durations': []}, 'B4': {'instants': [], 'durations': []}, 'C5': {'instants': [], 'durations': []}, 'C#5': {'instants': [], 'durations': []}}
-# Definição das figuras rítmicas e suas durações em relação ao tempo 4/4 (semínima = 1)
-FIGURAS = [
-    (4.0, "whole"),       # Semibreve
-    (3.0, "dottedHalf"),  # Mínima pontuada
-    (2.0, "half"),        # Mínima
-    (1.5, "dottedQuarter"),  # Semínima pontuada
-    (1.0, "quarter"),     # Semínima
-    (0.75, "dottedEighth"), # Colcheia pontuada
-    (0.5, "eighth"),      # Colcheia
-    (0.375, "dottedSixteenth"),  # Semicolcheia pontuada
-    (0.25, "sixteenth"),  # Semicolcheia
-]
 
-# Encontrando a maior duração para normalização
-max_duration, max_note, max_instant = max(
-    (d, note_name, inst) 
-    for note_name, note in notes_dict.items() 
-    for d, inst in zip(note["durations"], note["instants"])
-)
-min_duration, min_note, min_instant = min(
-    (d, note_name, inst) 
-    for note_name, note in notes_dict.items() 
-    for d, inst in zip(note["durations"], note["instants"])
-)
+NOTES_VALUES = {
+    "whole": 16, # Semibreve
+    "half": 8, # Mínima
+    "quarter": 4, # Semínima
+    "eighth": 2, # Colcheia
+    "16th": 1, # Semicolcheia
+}
 
-print('max_note:', max_note)
-print('max_instant:', max_instant)
-print('max_duration:', max_duration)
+minimum_note_duration = min(d for note in notes_dict.values() for d in note["durations"])
+maximum_note_duration = max(d for note in notes_dict.values() for d in note["durations"])
 
-# Função para mapear a duração para uma figura musical válida
-def map_duration(duration):
-    normalized = duration / max_duration * 4  # Ajustando para 4/4
-    for value, figure in FIGURAS:
-        if normalized >= value - 0.1:  # Margem de erro
-            return figure, value
-    return "sixteenth", 0.25  # Caso mínimo
 
-# Criando a partitura
-score = m21.stream.Score()
-score.append(m21.meter.TimeSignature("4/4"))
 
-# Criando uma parte para cada nota detectada
-for note_name, data in notes_dict.items():
-    part = m21.stream.Part()
-    measure = m21.stream.Measure(number=1)
-    time_counter = 0  # Controle do tempo no compasso
+durations = notes_dict['E4']['durations']
 
-    for instant, duration in zip(data["instants"], data["durations"]):
-        note = m21.note.Note(note_name)
-        figure, duration_quarter = map_duration(duration)
-        note.quarterLength = duration_quarter
+print('[1, 2, 4, 8, 16, 32, 64]')
 
-        # Se o compasso encher, criar um novo
-        if time_counter + duration_quarter > 4.0:
-            score.append(measure)
-            measure = m21.stream.Measure(number=measure.number + 1)
-            time_counter = 0
+for duration in durations:
+    print(normalize_note_value(duration, maximum_note_duration))
 
-        measure.append(note)
-        time_counter += duration_quarter
-
-    # Adiciona o último compasso restante
-    if len(measure.notes) > 0:
-        score.append(measure)
-
-# Salvando como MusicXML
-xml_path = "../xmls/generated_score.musicxml"
-score.write("musicxml", xml_path)
-
-# Retornar o caminho do arquivo gerado
-xml_path
