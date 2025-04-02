@@ -73,16 +73,21 @@ MUSIC_EXAMPLE = {
     }
 }
 
-def normalize_note_value(note_duration, maximum_note_duration):
-    return (note_duration * 64 / maximum_note_duration)
+def normalize_note_value(note_duration, minimum_note_duration):
+    return note_duration / minimum_note_duration
 
 minimum_note_duration = min(d for note in MUSIC_EXAMPLE.values() for d in note["durations"])
 maximum_note_duration = max(d for note in MUSIC_EXAMPLE.values() for d in note["durations"])
 
 # nota mais demorada: E4 = 71
 
-e4_durations = MUSIC_EXAMPLE['E4']['durations']
+durations = MUSIC_EXAMPLE['E4']['durations']
 
-# na teoria não era pra dar valores tão quebrados
-for duration in e4_durations:
-    print(normalize_note_value(duration, maximum_note_duration))
+print(durations)
+
+print('Max:', maximum_note_duration)
+print('Min:', minimum_note_duration)
+
+for duration in durations:
+    print(normalize_note_value(duration, minimum_note_duration), end=' ')
+print()

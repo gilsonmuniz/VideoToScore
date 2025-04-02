@@ -1,7 +1,5 @@
 def read_music_name():
-    # music_name = input('Music name: ')
-    music_name = 'heart_and_soul_cutted'
-    return music_name
+    return input('Insira o nome da música: ')
 
 def get_video_path(music_name):
     return '../videos/' + music_name + '.webm'

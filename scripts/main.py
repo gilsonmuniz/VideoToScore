@@ -9,7 +9,7 @@ from build_music import build_music
 from get_press_keys_instants import get_press_keys_instants
 
 C3_INDEX = 11
-AMOUNT_OF_KEYS = 36
+AMOUNT_OF_KEYS = 27
 
 music_name = read_music_name()
 keys_names = name_keys(C3_INDEX, AMOUNT_OF_KEYS)
