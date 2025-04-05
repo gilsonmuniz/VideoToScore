@@ -1,4 +1,4 @@
-from music_dicts.test import TEST as music
+from music_dicts.test_with_dots import TEST_WITH_DOTS as music
 
 def normalize_note_value(note_duration, minimum_note_duration):
     return note_duration / minimum_note_duration

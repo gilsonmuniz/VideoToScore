@@ -8,8 +8,8 @@ from calculate_press_and_hold_keys_durations import calculate_press_and_hold_key
 from build_music import build_music
 from get_press_keys_instants import get_press_keys_instants
 
-C3_INDEX = 3
-AMOUNT_OF_KEYS = 17
+C3_INDEX = 4
+AMOUNT_OF_KEYS = 18
 
 music_name = read_music_name()
 keys_indexes_names = name_keys(C3_INDEX, AMOUNT_OF_KEYS)
