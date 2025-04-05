@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from name_keys import name_keys
 
 def get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_image_path, keys_indexes_names):
     first_frame_image = cv2.imread(first_frame_image_path)

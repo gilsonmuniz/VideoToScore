@@ -1,11 +1,9 @@
 import cv2
 import numpy as np
-import os
-from name_keys import name_keys
 
 COLOR_THRESHOLD = 150
 
-def get_press_and_release_keys_frames_indexes(video_path, keys_attributes):
+def get_press_and_release_keys_frames_indexes(video_path, keys_attributes, keys_indexes_names):
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
@@ -14,7 +12,6 @@ def get_press_and_release_keys_frames_indexes(video_path, keys_attributes):
 
     previous_colors = {ball_number: info['color'] for ball_number, info in keys_attributes.items()}
 
-    keys_names = name_keys(11, 36)
     press_and_release_keys_frames_indexes = {}
     frame_index = 0
 
@@ -35,7 +32,7 @@ def get_press_and_release_keys_frames_indexes(video_path, keys_attributes):
             color_distance = np.linalg.norm(current_color_rgb - previous_color_rgb)
 
             if color_distance > COLOR_THRESHOLD:
-                key_name = keys_names[ball_number]
+                key_name = keys_indexes_names[ball_number]
                 press_and_release_keys_frames_indexes.setdefault(key_name, []).append(frame_index)
 
                 # update previous color

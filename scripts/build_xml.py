@@ -111,6 +111,8 @@ MARRIED_LIFE = {
     }
 }
 
+TEST = {'E2': {'instants': [29], 'durations': [1]}, 'F#2': {'instants': [88], 'durations': [2]}, 'G#2': {'instants': [148], 'durations': [3]}, 'A2': {'instants': [207], 'durations': [6]}, 'B2': {'instants': [264], 'durations': [14]}, 'C#3': {'instants': [321], 'durations': [30]}, 'D#3': {'instants': [379], 'durations': [58]}}
+
 def normalize_note_value(note_duration, minimum_note_duration):
     return note_duration / minimum_note_duration
 
