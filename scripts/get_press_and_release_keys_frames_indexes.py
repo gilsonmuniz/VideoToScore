@@ -7,7 +7,7 @@ def get_press_and_release_keys_frames_indexes(video_path, keys_attributes, keys_
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
-        print("Video not found.")
+        print('Video not found.')
         return
 
     previous_colors = {ball_number: info['color'] for ball_number, info in keys_attributes.items()}
