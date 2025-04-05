@@ -1,4 +1,7 @@
-MUSIC_EXAMPLE = {
+import math
+from functools import reduce
+
+HEART_AND_SOUL = {
     'C3': {
         'instants': [30, 150, 270, 389, 509, 630, 749, 870, 930, 1470, 1590, 1710, 1950],
         'durations': [28, 24, 28, 22, 24, 26, 29, 18, 64, 23, 23, 22]
@@ -73,20 +76,61 @@ MUSIC_EXAMPLE = {
     }
 }
 
+MARRIED_LIFE = {
+    'C3': {
+        'instants': [109, 160, 263, 314, 417, 469, 1137, 2217, 2294, 2346, 2680, 2886, 3606, 4686, 4763, 4814, 5149, 5354],
+        'durations': [38, 39, 38, 39, 39, 38, 103, 52, 26, 25, 64, 38, 77, 51, 26, 26, 64, 39]
+    },
+    'F3': {
+        'instants': [597, 649, 906, 1086, 1549, 1831, 1883, 3066, 3117, 3374, 3554, 4017, 4300, 4351, 5611],
+        'durations': [26, 25, 25, 25, 38, 26, 26, 25, 26, 26, 26, 39, 26, 26, 155]
+    },
+    'A3': {
+        'instants': [623, 931, 1291, 1446, 3091, 3400, 3760, 3914],
+        'durations': [26, 26, 39, 38, 26, 26, 39, 39]
+    },
+    'E3': {
+        'instants': [674, 957, 1909, 2140, 2191, 2320, 2783, 2989, 3143, 3426, 4377, 4609, 4660, 4789, 5251, 5457],
+        'durations': [155, 26, 154, 26, 26, 26, 51, 51, 103, 25, 154, 25, 26, 25, 52, 103]
+    },
+    'D3': {
+        'instants': [983, 1060, 1111, 1266, 1420, 1600, 1754, 2474, 2757, 2937, 3451, 3529, 3580, 3709, 3889, 4069, 4223, 4943, 5226, 5406],
+        'durations': [51, 26, 26, 25, 26, 129, 52, 26, 26, 39, 52, 25, 26, 38, 25, 128, 51, 26, 25, 38]
+    },
+    'G3': {
+        'instants': [1343, 1497, 1857, 2166, 3811, 3966, 4326, 4634],
+        'durations': [38, 39, 26, 25, 65, 38, 25, 26]
+    },
+    'A#2': {
+        'instants': [2371, 2449, 2500, 2629, 4840, 4917, 4969, 5097],
+        'durations': [52, 25, 26, 38, 51, 26, 25, 39]
+    },
+    'A2': {
+        'instants': [2577, 5046],
+        'durations': [39, 38]
+    }
+}
+
 def normalize_note_value(note_duration, minimum_note_duration):
     return note_duration / minimum_note_duration
 
-minimum_note_duration = min(d for note in MUSIC_EXAMPLE.values() for d in note["durations"])
-maximum_note_duration = max(d for note in MUSIC_EXAMPLE.values() for d in note["durations"])
+def map_occurrences_of_durations(music, maximum_note_duration):
+    occurrence_map = []
+    for _ in range(maximum_note_duration + 1): occurrence_map.append(0)
+    for instants_and_durations in music.values():
+        for duration in instants_and_durations['durations']:
+            occurrence_map[duration] += 1
+    return occurrence_map
 
-# nota mais demorada: E4 = 71
+minimum_note_duration = min(d for note in MARRIED_LIFE.values() for d in note["durations"])
+maximum_note_duration = max(d for note in MARRIED_LIFE.values() for d in note["durations"])
 
-durations = MUSIC_EXAMPLE['E4']['durations']
+durations = MARRIED_LIFE['E3']['durations']
 
 print(durations)
-
 print('Max:', maximum_note_duration)
 print('Min:', minimum_note_duration)
+print(map_occurrences_of_durations(MARRIED_LIFE, maximum_note_duration))
 
 for duration in durations:
     print(normalize_note_value(duration, minimum_note_duration), end=' ')

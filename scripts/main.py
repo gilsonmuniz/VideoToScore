@@ -8,17 +8,17 @@ from calculate_press_and_hold_keys_durations import calculate_press_and_hold_key
 from build_music import build_music
 from get_press_keys_instants import get_press_keys_instants
 
-C3_INDEX = 11
-AMOUNT_OF_KEYS = 27
+C3_INDEX = 3
+AMOUNT_OF_KEYS = 17
 
 music_name = read_music_name()
-keys_names = name_keys(C3_INDEX, AMOUNT_OF_KEYS)
+keys_indexes_names = name_keys(C3_INDEX, AMOUNT_OF_KEYS)
 video_path = get_video_path(music_name)
 first_frame_image_path = get_first_frame_image_path(music_name)
 first_video_frame = get_first_video_frame(video_path, first_frame_image_path)
 balls_image_path = get_balls_image_path(music_name)
 named_keys_image_path = get_named_keys_image_path(music_name)
-keys_coordinates = get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_image_path)
+keys_coordinates = get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_image_path, keys_indexes_names)
 keys_attributes = get_keys_colors(keys_coordinates, first_video_frame)
 press_and_release_keys_frames_indexes = get_press_and_release_keys_frames_indexes(video_path, keys_attributes)
 press_keys_instants = get_press_keys_instants(press_and_release_keys_frames_indexes)

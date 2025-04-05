@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from name_keys import name_keys
 
-def get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_image_path):
+def get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_image_path, keys_indexes_names):
     first_frame_image = cv2.imread(first_frame_image_path)
     balls_image = cv2.imread(balls_image_path)
 
@@ -38,7 +38,7 @@ def get_balls_cordinates(first_frame_image_path, balls_image_path, named_keys_im
     balls_coordinates.sort(key=lambda coord: coord[0])
     for balls_count, (x, y) in enumerate(balls_coordinates, start=1):
         # write notes names in keys
-        key_name = name_keys(11, 36)[balls_count]
+        key_name = keys_indexes_names[balls_count]
         cv2.putText(first_frame_image, key_name, (x - 15, y - 15), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
 

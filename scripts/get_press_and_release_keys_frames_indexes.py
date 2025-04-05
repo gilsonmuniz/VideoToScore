@@ -3,7 +3,7 @@ import numpy as np
 import os
 from name_keys import name_keys
 
-COLOR_THRESHOLD = 170
+COLOR_THRESHOLD = 150
 
 def get_press_and_release_keys_frames_indexes(video_path, keys_attributes):
     cap = cv2.VideoCapture(video_path)
