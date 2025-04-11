@@ -21,6 +21,3 @@ print('Max:', maximum_note_duration)
 print('Min:', minimum_note_duration)
 print(map_occurrences_of_durations(music, maximum_note_duration))
 
-for duration in durations:
-    print(normalize_note_value(duration, minimum_note_duration), end=' ')
-print()
