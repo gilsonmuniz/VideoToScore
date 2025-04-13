@@ -1,5 +1,3 @@
-from music_dicts.test_with_dots import TEST_WITH_DOTS as music
-
 STANDARD_NOTES_VALUES = (
     1, # semifusa
     2, # fusa
@@ -33,5 +31,3 @@ def format_music_values(music):
         note_data['durations'] = [format_note_duration(d) for d in note_data['durations']]
         note_data['instants'] = [format_note_instant(i, first_note_instant) for i in note_data['instants']]
     return music
-
-print(format_music_values(music))

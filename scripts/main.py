@@ -7,6 +7,7 @@ from get_press_and_release_keys_frames_indexes import get_press_and_release_keys
 from calculate_press_and_hold_keys_durations import calculate_press_and_hold_keys_durations
 from build_music import build_music
 from get_press_keys_instants import get_press_keys_instants
+from format_music_values import format_music_values
 
 C3_INDEX = 4
 AMOUNT_OF_KEYS = 18
@@ -23,6 +24,7 @@ keys_attributes = get_keys_colors(keys_coordinates, first_video_frame)
 press_and_release_keys_frames_indexes = get_press_and_release_keys_frames_indexes(video_path, keys_attributes, keys_indexes_names)
 press_keys_instants = get_press_keys_instants(press_and_release_keys_frames_indexes)
 press_and_hold_keys_durations = calculate_press_and_hold_keys_durations(press_and_release_keys_frames_indexes)
-music = build_music(press_keys_instants, press_and_hold_keys_durations)
+unformatted_music = build_music(press_keys_instants, press_and_hold_keys_durations)
+music = format_music_values(unformatted_music)
 
 print(music)
