@@ -8,9 +8,10 @@ from calculate_press_and_hold_keys_durations import calculate_press_and_hold_key
 from build_music import build_music
 from get_press_keys_instants import get_press_keys_instants
 from format_music_values import format_music_values
+from build_xml import build_xml
 
-C3_INDEX = 4
-AMOUNT_OF_KEYS = 18
+C3_INDEX = 3
+AMOUNT_OF_KEYS = 17
 
 music_name = read_music_name()
 keys_indexes_names = name_keys(C3_INDEX, AMOUNT_OF_KEYS)
@@ -26,5 +27,6 @@ press_keys_instants = get_press_keys_instants(press_and_release_keys_frames_inde
 press_and_hold_keys_durations = calculate_press_and_hold_keys_durations(press_and_release_keys_frames_indexes)
 unformatted_music = build_music(press_keys_instants, press_and_hold_keys_durations)
 music = format_music_values(unformatted_music)
+xml = build_xml(music)
 
-print(music)
+print(xml)
