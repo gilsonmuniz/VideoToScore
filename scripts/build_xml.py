@@ -23,25 +23,6 @@ def parse_note_name(name):
         octave = int(name[-1])
     return step, alter, octave
 
-def get_base_and_dot(duration):
-    return duration, duration not in STANDARD_NOTES_VALUES
-
-def create_note_element(step, alter, octave, duration_value):
-    base_value, dotted = get_base_and_dot(duration_value)
-
-    note = ET.Element("note")
-    pitch = ET.SubElement(note, "pitch")
-    ET.SubElement(pitch, "step").text = step
-    if alter != 0:
-        ET.SubElement(pitch, "alter").text = str(alter)
-    ET.SubElement(pitch, "octave").text = str(octave)
-
-    ET.SubElement(note, "duration").text = str(duration_value)
-    ET.SubElement(note, "type").text = note_type_from_duration(base_value)
-    if dotted:
-        ET.SubElement(note, "dot")
-    return note
-
 def note_type_from_duration(duration):
     standard_types = {
         1: '64th',
@@ -52,10 +33,29 @@ def note_type_from_duration(duration):
         32: 'half',
         64: 'whole'
     }
-    if duration in STANDARD_NOTES_VALUES:
-        return standard_types[duration]
 
-def build_xml(music_dict):
+    if duration in STANDARD_NOTES_VALUES: return standard_types[duration], False
+    closest_duration = max(k for k in standard_types if k <= duration)
+    note_type = standard_types[closest_duration]
+    return note_type, True
+
+def create_note_element(step, alter, octave, duration_value):
+    note_type, dotted = note_type_from_duration(duration_value)
+
+    note = ET.Element("note")
+    pitch = ET.SubElement(note, "pitch")
+    ET.SubElement(pitch, "step").text = step
+    if alter != 0:
+        ET.SubElement(pitch, "alter").text = str(alter)
+    ET.SubElement(pitch, "octave").text = str(octave)
+
+    ET.SubElement(note, "duration").text = str(duration_value)
+    ET.SubElement(note, "type").text = note_type
+    if dotted:
+        ET.SubElement(note, "dot")
+    return note
+
+def build_xml(music_dict, music_name):
     score = ET.Element('score-partwise', version='3.1')
     part_list = ET.SubElement(score, 'part-list')
     score_part = ET.SubElement(part_list, 'score-part', id='P1')
@@ -99,4 +99,4 @@ def build_xml(music_dict):
         time_in_measure += duration
 
     tree = ET.ElementTree(score)
-    tree.write('../xmls/output.xml', encoding='utf-8', xml_declaration=True)
+    tree.write(f'../xmls/{music_name}.xml', encoding='utf-8', xml_declaration=True)
