@@ -12,3 +12,6 @@ def get_first_frame_image_path(music_name):
 
 def get_named_keys_image_path(music_name):
     return '../images/' + music_name + '_named_keys.png'
+
+def get_xml_path(music_name):
+    return '../xmls/' + music_name + '.xml'

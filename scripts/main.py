@@ -1,5 +1,5 @@
 from name_keys import name_keys
-from get_paths import read_music_name, get_balls_image_path, get_video_path, get_first_frame_image_path, get_named_keys_image_path
+from get_paths import read_music_name, get_balls_image_path, get_video_path, get_first_frame_image_path, get_named_keys_image_path, get_xml_path
 from get_balls_cordinates import get_balls_cordinates
 from get_first_video_frame import get_first_video_frame
 from get_keys_colors import get_keys_colors
@@ -27,5 +27,6 @@ press_keys_instants = get_press_keys_instants(press_and_release_keys_frames_inde
 press_and_hold_keys_durations = calculate_press_and_hold_keys_durations(press_and_release_keys_frames_indexes)
 unformatted_music = build_music(press_keys_instants, press_and_hold_keys_durations)
 music = format_music_values(unformatted_music)
-xml = build_xml(music, music_name)
+xml_path = get_xml_path(music_name)
+xml = build_xml(music, xml_path)
 print('music:', music)

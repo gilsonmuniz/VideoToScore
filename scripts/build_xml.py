@@ -42,20 +42,20 @@ def note_type_from_duration(duration):
 def create_note_element(step, alter, octave, duration_value):
     note_type, dotted = note_type_from_duration(duration_value)
 
-    note = ET.Element("note")
-    pitch = ET.SubElement(note, "pitch")
-    ET.SubElement(pitch, "step").text = step
+    note = ET.Element('note')
+    pitch = ET.SubElement(note, 'pitch')
+    ET.SubElement(pitch, 'step').text = step
     if alter != 0:
-        ET.SubElement(pitch, "alter").text = str(alter)
-    ET.SubElement(pitch, "octave").text = str(octave)
+        ET.SubElement(pitch, 'alter').text = str(alter)
+    ET.SubElement(pitch, 'octave').text = str(octave)
 
-    ET.SubElement(note, "duration").text = str(duration_value)
-    ET.SubElement(note, "type").text = note_type
+    ET.SubElement(note, 'duration').text = str(duration_value)
+    ET.SubElement(note, 'type').text = note_type
     if dotted:
-        ET.SubElement(note, "dot")
+        ET.SubElement(note, 'dot')
     return note
 
-def build_xml(music_dict, music_name):
+def build_xml(music_dict, xml_path):
     score = ET.Element('score-partwise', version='3.1')
     part_list = ET.SubElement(score, 'part-list')
     score_part = ET.SubElement(part_list, 'score-part', id='P1')
@@ -99,4 +99,4 @@ def build_xml(music_dict, music_name):
         time_in_measure += duration
 
     tree = ET.ElementTree(score)
-    tree.write(f'../xmls/{music_name}.xml', encoding='utf-8', xml_declaration=True)
+    tree.write(xml_path, encoding='utf-8', xml_declaration=True)
