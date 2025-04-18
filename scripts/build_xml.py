@@ -1,16 +1,17 @@
 import xml.etree.ElementTree as ET
+from itertools import groupby
 
 STANDARD_NOTES_VALUES = (
-    1, # semifusa
-    2, # fusa
-    4, # semicolcheia
-    8, # colcheia
+    1,  # semifusa
+    2,  # fusa
+    4,  # semicolcheia
+    8,  # colcheia
     16, # semínima
     32, # mínima
-    64 # semibreve
+    64  # semibreve
 )
 
-DIVISIONS = 1 # Base de divisão para a menor nota (semifusa = 1)
+DIVISIONS = 1  # Base de divisão para a menor nota (semifusa = 1)
 
 def parse_note_name(name):
     if len(name) == 2:
@@ -34,7 +35,8 @@ def note_type_from_duration(duration):
         64: 'whole'
     }
 
-    if duration in STANDARD_NOTES_VALUES: return standard_types[duration], False
+    if duration in STANDARD_NOTES_VALUES:
+        return standard_types[duration], False
     closest_duration = max(k for k in standard_types if k <= duration)
     note_type = standard_types[closest_duration]
     return note_type, True
@@ -63,7 +65,7 @@ def build_xml(music_dict, xml_path):
 
     part = ET.SubElement(score, 'part', id='P1')
 
-    # Unifica as notas por instante para ordenar
+    # Agrupa todas as notas por instante
     all_notes = []
     for note_name, data in music_dict.items():
         for instant, duration in zip(data['instants'], data['durations']):
@@ -71,13 +73,14 @@ def build_xml(music_dict, xml_path):
     all_notes.sort()
 
     measure = None
-    current_time = 0
     measure_number = 1
-    measure_duration = 64 # 4/4, com semibreve como base (64 = semibreve)
-
+    measure_duration = 64  # 4/4, semibreve como unidade base
     time_in_measure = 0
 
-    for instant, duration, note_name in all_notes:
+    for instant, group in groupby(all_notes, key=lambda x: x[0]):
+        group = list(group)
+
+        # Cria nova medida se necessário
         if measure is None or time_in_measure >= measure_duration:
             measure = ET.SubElement(part, 'measure', number=str(measure_number))
             measure_number += 1
@@ -93,10 +96,16 @@ def build_xml(music_dict, xml_path):
             ET.SubElement(clef, 'line').text = '2'
             time_in_measure = 0
 
-        step, alter, octave = parse_note_name(note_name)
-        note_element = create_note_element(step, alter, octave, duration)
-        measure.append(note_element)
-        time_in_measure += duration
+        # Adiciona notas simultâneas
+        for i, (_, duration, note_name) in enumerate(group):
+            step, alter, octave = parse_note_name(note_name)
+            note_element = create_note_element(step, alter, octave, duration)
+            if i > 0:
+                ET.SubElement(note_element, 'chord')
+            measure.append(note_element)
+
+        # Avança o tempo apenas uma vez por conjunto simultâneo
+        time_in_measure += group[0][1]
 
     tree = ET.ElementTree(score)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
