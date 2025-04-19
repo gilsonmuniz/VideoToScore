@@ -76,11 +76,43 @@ def build_xml(music_dict, xml_path):
     measure_number = 1
     measure_duration = 64  # 4/4, semibreve como unidade base
     time_in_measure = 0
+    last_instant = 0  # Marca o tempo da última nota ou pausa adicionada
 
     for instant, group in groupby(all_notes, key=lambda x: x[0]):
         group = list(group)
 
-        # Cria nova medida se necessário
+        # Verifica se houve espaço vazio desde o último instante
+        if instant > last_instant:
+            silence_duration = instant - last_instant
+
+            # Cria nova medida se necessário
+            if measure is None or time_in_measure + silence_duration > measure_duration:
+                measure = ET.SubElement(part, 'measure', number=str(measure_number))
+                measure_number += 1
+                attributes = ET.SubElement(measure, 'attributes')
+                ET.SubElement(attributes, 'divisions').text = str(DIVISIONS)
+                time = ET.SubElement(attributes, 'time')
+                ET.SubElement(time, 'beats').text = '4'
+                ET.SubElement(time, 'beat-type').text = '4'
+                key = ET.SubElement(attributes, 'key')
+                ET.SubElement(key, 'fifths').text = '0'
+                clef = ET.SubElement(attributes, 'clef')
+                ET.SubElement(clef, 'sign').text = 'G'
+                ET.SubElement(clef, 'line').text = '2'
+                time_in_measure = 0
+
+            # Adiciona a pausa
+            rest_note = ET.Element('note')
+            ET.SubElement(rest_note, 'rest')
+            ET.SubElement(rest_note, 'duration').text = str(silence_duration)
+            note_type, dotted = note_type_from_duration(silence_duration)
+            ET.SubElement(rest_note, 'type').text = note_type
+            if dotted:
+                ET.SubElement(rest_note, 'dot')
+            measure.append(rest_note)
+            time_in_measure += silence_duration
+
+        # Cria nova medida se necessário antes de adicionar notas
         if measure is None or time_in_measure >= measure_duration:
             measure = ET.SubElement(part, 'measure', number=str(measure_number))
             measure_number += 1
@@ -96,7 +128,7 @@ def build_xml(music_dict, xml_path):
             ET.SubElement(clef, 'line').text = '2'
             time_in_measure = 0
 
-        # Adiciona notas simultâneas
+        # Adiciona as notas simultâneas (acordes)
         for i, (_, duration, note_name) in enumerate(group):
             step, alter, octave = parse_note_name(note_name)
             note_element = create_note_element(step, alter, octave, duration)
@@ -104,8 +136,8 @@ def build_xml(music_dict, xml_path):
                 ET.SubElement(note_element, 'chord')
             measure.append(note_element)
 
-        # Avança o tempo apenas uma vez por conjunto simultâneo
         time_in_measure += group[0][1]
+        last_instant = instant + group[0][1]
 
     tree = ET.ElementTree(score)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
